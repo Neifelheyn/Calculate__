@@ -3,6 +3,11 @@ import java.util.Scanner;
 
 
 public class Calculator {
+    char[] ops = new char[]{'*', '/', '+', '-'};
+
+    Calculator() {
+    }
+
 
     public void Start() {
         String formula = UserInput();
@@ -39,31 +44,36 @@ public class Calculator {
         }
         lNumbers.add(Double.parseDouble(number.toString()));
 
-int i = 0;
         while (lNumbers.size() != 1) {
 
-            double result = 0;
 
-            switch (lOperations.get(i)) {
-                case '+':
-                    result = lNumbers.get(0) + lNumbers.get(1);
-                    break;
-                case '-':
-                    result = lNumbers.get(0) - lNumbers.get(1);
-                    break;
-                case '*':
-                    result = lNumbers.get(0) * lNumbers.get(1);
-                    break;
-                case '/':
-                    result = lNumbers.get(0) / lNumbers.get(1);
-                    break;
-                default:
-                    break;
+            for (int i = 0; i < ops.length; i++) {
+                int index = lOperations.indexOf(ops[i]);
+                if (index < 0)
+                    continue;
+
+                double result = 0;
+                switch (lOperations.get(index)) {
+                    case '+':
+                        result = lNumbers.get(index) + lNumbers.get(index + 1);
+                        break;
+                    case '-':
+                        result = lNumbers.get(index) - lNumbers.get(index + 1);
+                        break;
+                    case '*':
+                        result = lNumbers.get(index) * lNumbers.get(index + 1);
+                        break;
+                    case '/':
+                        result = lNumbers.get(index) / lNumbers.get(index + 1);
+                        break;
+                    default:
+                        break;
+                }
+                lNumbers.remove(index);
+                lNumbers.remove(index);
+                lOperations.remove(index);
+                lNumbers.add(index, result);
             }
-            lNumbers.remove(0);
-            lNumbers.remove(0);
-            lNumbers.add(0, result);
-            i++;
         }
         return lNumbers.get(0);
     }
