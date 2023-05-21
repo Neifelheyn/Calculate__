@@ -1,25 +1,21 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-
 public class Calculator {
-    char[] ops = new char[]{'*', '/', '+', '-'};
+    private static final char[] ops = new char[]{'*', '/', '+', '-'};
 
-    Calculator() {
-    }
-
+    public Calculator() { }
 
     public void Start() {
         String formula = UserInput();
-        double resultat = Calculeted(formula);
-        System.out.println(resultat);
+
+        double result = Calculeted(formula);
+        System.out.println(result);
     }
 
     private String UserInput() {
-        String formula = "";
         Scanner keyboard = new Scanner(System.in);
-        formula = keyboard.nextLine();
-        return formula;
+        return keyboard.nextLine().replaceAll("\\s", "");
     }
 
     private boolean isDigit(char ch) {
@@ -30,51 +26,56 @@ public class Calculator {
         ArrayList<Double> lNumbers = new ArrayList<>();
         ArrayList<Character> lOperations = new ArrayList<>();
 
-        formula = formula.replaceAll("\\s", "");
-
         StringBuilder number = new StringBuilder();
         for (int i = 0; i < formula.length(); i++) {
-            if (isDigit(formula.charAt(i))) {
-                number.append(formula.charAt(i));
+            char symbol = formula.charAt(i);
+            if (isDigit(symbol)) {
+                number.append(symbol);
             } else {
                 lNumbers.add(Double.parseDouble(number.toString()));
-                lOperations.add(formula.charAt(i));
+                lOperations.add(symbol);
                 number.setLength(0);
             }
         }
         lNumbers.add(Double.parseDouble(number.toString()));
 
-        while (lNumbers.size() != 1) {
-
-
-            for (int i = 0; i < ops.length; i++) {
-                int index = lOperations.indexOf(ops[i]);
-                if (index < 0)
-                    continue;
-
-                double result = 0;
-                switch (lOperations.get(index)) {
-                    case '+':
-                        result = lNumbers.get(index) + lNumbers.get(index + 1);
-                        break;
-                    case '-':
-                        result = lNumbers.get(index) - lNumbers.get(index + 1);
-                        break;
-                    case '*':
-                        result = lNumbers.get(index) * lNumbers.get(index + 1);
-                        break;
-                    case '/':
-                        result = lNumbers.get(index) / lNumbers.get(index + 1);
-                        break;
-                    default:
-                        break;
-                }
-                lNumbers.remove(index);
-                lNumbers.remove(index);
-                lOperations.remove(index);
-                lNumbers.add(index, result);
+        for (int i = 0; i < ops.length; ) {
+            int index = lOperations.indexOf(ops[i]);
+            if (index < 0) {
+                i++;
+                continue;
             }
+
+            double number1 = lNumbers.get(index);
+            double number2 = lNumbers.get(index + 1);
+            char operation = lOperations.get(index);
+            double result = 0;
+
+            switch (operation) {
+                case '+' -> result = number1 + number2;
+                case '-' -> result = number1 - number2;
+                case '*' -> result = number1 * number2;
+                case '/' -> {
+                    if (number2 != 0) {
+                        result = number1 / number2;
+                    } else {
+                        System.out.println("ZERO");
+                    }
+                }
+
+
+                default -> {
+                }
+            }
+
+            lNumbers.remove(index);
+            lNumbers.remove(index);
+
+            lOperations.remove(index);
+
+            lNumbers.add(index, result);
         }
+
         return lNumbers.get(0);
     }
 }
