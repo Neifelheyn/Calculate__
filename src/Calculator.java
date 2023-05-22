@@ -26,8 +26,8 @@ public class Calculator {
         ArrayList<Double> lNumbers = new ArrayList<>();
         ArrayList<Character> lOperations = new ArrayList<>();
 
-        StringBuilder number = new StringBuilder();
-        for (int i = 0; i < formula.length(); i++) {
+        StringBuilder number = new StringBuilder(String.valueOf(formula.charAt(0)));
+        for (int i = 1; i < formula.length(); i++) {
             char symbol = formula.charAt(i);
             if (isDigit(symbol)) {
                 number.append(symbol);
