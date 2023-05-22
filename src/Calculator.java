@@ -59,7 +59,7 @@ public class Calculator {
                     if (number2 != 0) {
                         result = number1 / number2;
                     } else {
-                        System.out.println("ZERO");
+                        System.out.println("ERROR: Division on zero is not possible ");
                     }
                 }
 
