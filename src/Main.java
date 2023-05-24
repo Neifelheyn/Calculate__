@@ -1,10 +1,11 @@
-import java.io.InputStream;
-import java.util.Scanner;
-
-
 public class Main {
     public static void main(String[] args) {
-	    Calculator calculator = new Calculator();
-	    calculator.Start();
+
+        try {
+            double result = Calculator.Result();
+            System.out.println(result);
+        } catch (Exception ex) {
+            System.out.println("ERROR: Unknown");
+        }
     }
 }

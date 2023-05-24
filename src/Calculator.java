@@ -1,81 +1,97 @@
-import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Stack;
 
 public class Calculator {
-    private static final char[] ops = new char[]{'*', '/', '+', '-'};
-
-    public Calculator() { }
-
-    public void Start() {
+    private Calculator() { }
+    public static double Result() {
         String formula = UserInput();
-
-        double result = Calculeted(formula);
-        System.out.println(result);
+        return Start(formula);
     }
-
-    private String UserInput() {
+    private static String UserInput() {
+        System.out.print("ENTER YOUR FORMULA : ");
         Scanner keyboard = new Scanner(System.in);
         return keyboard.nextLine().replaceAll("\\s", "");
     }
-
-    private boolean isDigit(char ch) {
-        return ch >= '0' && ch <= '9';
+    private static boolean isDigit(char ch) { return ch >= '0' && ch <= '9'; }
+    private static boolean isOperator(char c) {
+         return c == '+' || c == '-' || c == '*' || c == '/';
     }
+    private static boolean Priority(char op1, char op2) {
+        return ((op1 == '*' || op1 == '/') && (op2 == '+' || op2 == '-')
+                || (op1 == '+' || op1 == '-') && (op2 == '+' || op2 == '-'));
+    }
+    private static double Start(String formula) {
+        Stack<Double> stackNumbers = new Stack<>();
+        Stack<Character> stackOperations = new Stack<>();
 
-    private double Calculeted(String formula) {
-        ArrayList<Double> lNumbers = new ArrayList<>();
-        ArrayList<Character> lOperations = new ArrayList<>();
+        int i = 0;
+        while (i < formula.length()) {
+            char c = formula.charAt(i);
 
-        StringBuilder number = new StringBuilder(String.valueOf(formula.charAt(0)));
-        for (int i = 1; i < formula.length(); i++) {
-            char symbol = formula.charAt(i);
-            if (isDigit(symbol)) {
-                number.append(symbol);
-            } else {
-                lNumbers.add(Double.parseDouble(number.toString()));
-                lOperations.add(symbol);
-                number.setLength(0);
-            }
-        }
-        lNumbers.add(Double.parseDouble(number.toString()));
+            if (isDigit(c)) {
+                StringBuilder sb = new StringBuilder();
+                while (i < formula.length() && isDigit(formula.charAt(i))) {
+                    sb.append(formula.charAt(i));
+                    i++;
+                }
 
-        for (int i = 0; i < ops.length; ) {
-            int index = lOperations.indexOf(ops[i]);
-            if (index < 0) {
+                double number = Double.parseDouble(sb.toString());
+                stackNumbers.push(number);
+
+            } else if (isOperator(c)) {
+                while (!stackOperations.isEmpty() && Priority(stackOperations.peek(), c)) {
+                    double number2 = stackNumbers.pop();
+                    double number1 = stackNumbers.pop();
+                    char operator = stackOperations.pop();
+                    double result = performOperation(operator, number1, number2);
+                    stackNumbers.push(result);
+                }
+                stackOperations.push(c);
                 i++;
-                continue;
-            }
-
-            double number1 = lNumbers.get(index);
-            double number2 = lNumbers.get(index + 1);
-            char operation = lOperations.get(index);
-            double result = 0;
-
-            switch (operation) {
-                case '+' -> result = number1 + number2;
-                case '-' -> result = number1 - number2;
-                case '*' -> result = number1 * number2;
-                case '/' -> {
-                    if (number2 != 0) {
-                        result = number1 / number2;
-                    } else {
-                        System.out.println("ERROR: Division on zero is not possible ");
-                    }
+            } else if (c == '(') {
+                stackOperations.push(c);
+                i++;
+            } else if (c == ')') {
+                while (!stackOperations.isEmpty() && stackOperations.peek() != '(') {
+                    double number2 = stackNumbers.pop();
+                    double number1 = stackNumbers.pop();
+                    char operator = stackOperations.pop();
+                    double result = performOperation(operator, number1, number2);
+                    stackNumbers.push(result);
                 }
-
-
-                default -> {
+                if (!stackOperations.isEmpty() && stackOperations.peek() == '(') {
+                    stackOperations.pop();
                 }
+                i++;
+            } else {
+                throw new IllegalArgumentException("Неверный символ: " + c);
             }
-
-            lNumbers.remove(index);
-            lNumbers.remove(index);
-
-            lOperations.remove(index);
-
-            lNumbers.add(index, result);
         }
+        while (!stackOperations.isEmpty()) {
+            double number2 = stackNumbers.pop();
+            double number1 = stackNumbers.pop();
+            char operator = stackOperations.pop();
+            double result = performOperation(operator, number1, number2);
+            stackNumbers.push(result);
+        }
+        return stackNumbers.pop();
+    }
+    private static double performOperation(char operator, double number1, double number2) {
+        double result = 0;
 
-        return lNumbers.get(0);
+        switch (operator) {
+            case '+' -> result = number1 + number2;
+            case '-' -> result = number1 - number2;
+            case '*' -> result = number1 * number2;
+            case '/' -> {
+                if (number2 != 0) {
+                    result = number1 / number2;
+                } else {
+                    throw new IllegalArgumentException("ERROR: Division on zero is not possible");
+                }
+            }
+            default -> {}
+        }
+        return result;
     }
 }
